@@ -1,7 +1,6 @@
 // The MESSAGE event runs anytime a message is received
 // Note that due to the binding of client to every event, every event
 // goes `client, other, args` when this function is run.
-
 module.exports = (client, message) => {
   // It's good practice to ignore other bots. This also makes your bot ignore itself
   // and not get into a spam loop (we call that "botception").
@@ -10,6 +9,38 @@ module.exports = (client, message) => {
   // Grab the settings for this server from Enmap.
   // If there is no guild, get default conf (DMs)
   const settings = message.settings = client.getGuildSettings(message.guild);
+  const level = client.permlevel(message);
+  
+  // Swear Detection
+  const swears = require("../modules/swears.js");
+  var words = message.content.toLowerCase().trim().match(/\w+|\s+|[^\s\w]+/g);
+  for (x = 0; x < 554; x++) {
+    if (words.includes(swears.list[x])) {
+      if (settings.profanityFilter === "true") {
+        if (settings.profanityMessage.includes("{{user}}")) {
+          const curseMessage = settings.profanityMessage.replace("{{user}}", message.author.username);
+            if (settings.profanityAlert === "true") {
+              message.channel.send(curseMessage);
+            }
+          client.logger.warn(`[Profanity] ${client.config.permLevels.find(l => l.level === level).name} ${message.author.username} (${message.author.id}) detected cursing.`);
+          message.delete();
+          return;
+        }
+        if (settings.profanityMessage.includes("{{mention}}")) {
+          const curseMessage = settings.profanityMessage.replace("{{mention}}", "<@" + message.author.id + ">");
+            if (settings.profanityAlert === "true") {
+              message.channel.send(curseMessage);
+            }
+          client.logger.warn(`[Profanity] ${client.config.permLevels.find(l => l.level === level).name} ${message.author.username} (${message.author.id}) detected cursing.`);
+          message.delete();
+          return;
+        }
+      } 
+      else {
+        return;
+      }
+    }
+  }
 
   // Also good practice to ignore any message that does not start with our prefix,
   // which is set in the configuration file.
@@ -21,9 +52,6 @@ module.exports = (client, message) => {
   // args = ["Is", "this", "the", "real", "life?"]
   const args = message.content.slice(settings.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
-
-  // Get the user or member's permission level from the elevation
-  const level = client.permlevel(message);
 
   // Check whether the command, or alias, exist in the collections defined
   // in app.js.
