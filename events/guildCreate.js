@@ -1,5 +1,4 @@
-// This event executes when a new guild (server) is joined.
-
-module.exports = (client, guild) => {
-  client.logger.cmd(`[GUILD JOIN] ${guild.name} (${guild.id}) added the bot. Owner: ${guild.owner.user.tag} (${guild.owner.user.id})`);
-};
+exports.run = (client, guild) => {
+    console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
+    client.user.setActivity(`Serving ${client.guilds.size} servers`);
+}
