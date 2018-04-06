@@ -22,7 +22,6 @@ module.exports = (client, message) => {
             if (settings.profanityAlert === "true") {
               message.channel.send(curseMessage);
             }
-          message.guild.channels.find('name', settings.modLogChannel).send(`[Profanity] ${client.config.permLevels.find(l => l.level === level).name} ${message.author.username} (${message.author.id}) detected cursing.`);
           client.logger.warn(`[Profanity] ${client.config.permLevels.find(l => l.level === level).name} ${message.author.username} (${message.author.id}) detected cursing.`);
           message.delete();
           return;
@@ -32,12 +31,11 @@ module.exports = (client, message) => {
             if (settings.profanityAlert === "true") {
               message.channel.send(curseMessage);
             }
-          message.guild.channels.find('name', settings.modLogChannel).send(`**[Profanity]** *${client.config.permLevels.find(l => l.level === level).name}* **${message.author.username}** *(${message.author.id})* detected cursing.`);
           client.logger.warn(`[Profanity] ${client.config.permLevels.find(l => l.level === level).name} ${message.author.username} (${message.author.id}) detected cursing.`);
           message.delete();
           return;
         }
-      }
+      } 
       else {
         return;
       }
